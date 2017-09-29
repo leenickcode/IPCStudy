@@ -42,7 +42,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".socket.TCPServerService"></service>
+        <service android:name=".socket.TCPServerService"
+            android:process=":provider"
+            ></service>
     </application>
 
 </manifest>

@@ -64,13 +64,13 @@ public class TCPServerService extends Service {
             }
             while (!mIsServiceDestoryed){
                 try {
-                    final Socket client=serverSocket.accept();
+                    final Socket client=serverSocket.accept();//有链接则会返回，没有则会阻塞
                     Log.e(TAG, "accept: ");
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
                             try {
-                                responseClient(client);
+                                responseClient(client);//链接成功就响应客户端
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -83,13 +83,18 @@ public class TCPServerService extends Service {
             }
         }
     }
+
+    /**
+     * 响应客户端
+     * @param client
+     * @throws IOException
+     */
     private void responseClient(Socket client) throws IOException {
-        BufferedReader in=new BufferedReader(new InputStreamReader(client.getInputStream()));
-        PrintWriter out=new PrintWriter(new BufferedWriter(new OutputStreamWriter(client.getOutputStream())),true);
+        BufferedReader in=new BufferedReader(new InputStreamReader(client.getInputStream()));//得到输入流，用来读取客户端发送过来的消息
+        PrintWriter out=new PrintWriter(new BufferedWriter(new OutputStreamWriter(client.getOutputStream())),true);//创建输出流，
         out.println("欢迎来到聊天室");
         while (!mIsServiceDestoryed){
-            out.println("在循环吗");
-            String st=in.readLine();
+            String st=in.readLine();//读取消息
             System.out.println(st);
             if (st==null){
                 //客户端断开连接
@@ -97,7 +102,7 @@ public class TCPServerService extends Service {
             }
             int i=new Random().nextInt(mDefinedMessages.length);
             String msg=mDefinedMessages[i];
-            out.println(msg);
+            out.println(msg);//发消息给客户端
             System.out.println(msg);
         }
         out.close();

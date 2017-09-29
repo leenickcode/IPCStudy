@@ -40,7 +40,7 @@ public class TCPClientActivity extends Activity implements View.OnClickListener 
     private Button mSendButton;
     private TextView mMessageTextView;
     private EditText mMessageEditText;
-    private PrintWriter mPrintWriter;
+    private PrintWriter mPrintWriter;//通过这个与服务端发送消息
     private Socket mClientSocket;
     @SuppressLint("HandlerLeak")
     private Handler mHandler=new Handler(){
@@ -92,14 +92,12 @@ public class TCPClientActivity extends Activity implements View.OnClickListener 
     @Override
     public void onClick(View v) {
         if (v==mSendButton){
-//            new Thread(new Runnable() {
-//                @Override
-//                public void run() {
                     final String msg=mMessageEditText.getText().toString();
                     if (!TextUtils.isEmpty(msg)&&mPrintWriter!=null){
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
+                                //网络通信不能在ui线程中
                                 mPrintWriter.println(msg);
                             }
                         }).start();
@@ -108,8 +106,6 @@ public class TCPClientActivity extends Activity implements View.OnClickListener 
                         final  String showedMsg="self"+time+":"+msg+"\n";
                         mMessageTextView.setText(mMessageTextView.getText()+showedMsg);
                     }
-//                }
-//            }).start();
 
         }
     }
@@ -117,13 +113,17 @@ public class TCPClientActivity extends Activity implements View.OnClickListener 
     private String formatDateTime(long time){
         return new SimpleDateFormat("(HH:mm:ss)").format(new Date(time));
     }
+
+    /**
+     * 连接服务端
+     */
     private void connectTCPServer(){
         Socket socket=null;
         while (socket==null){
             try {
-                socket=new Socket("localhost",8668);
+                socket=new Socket("localhost",8668);//创建socket并且连接服务器
                 mClientSocket=socket;
-                mPrintWriter=new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())),true);
+                mPrintWriter=new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())),true);//先获取输出流
                 mHandler.sendEmptyMessage(MESSAGE_SOCKET_CONNECTED);
                 System.out.println("连接服务器");
             } catch (IOException e) {
@@ -133,10 +133,11 @@ public class TCPClientActivity extends Activity implements View.OnClickListener 
             }
         }
         try {
-            BufferedReader br=new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            BufferedReader br=new BufferedReader(new InputStreamReader(socket.getInputStream()));//获取输入流，用来读取服务端发送的消息
             while (!TCPClientActivity.this.isFinishing()){
+                Log.e(TAG, "循环？: " );
                 String msg=br.readLine();
-                System.out.println("service:"+msg);
+//                System.out.println("service:"+msg);
                 if (msg!=null){
                     String time=formatDateTime(System.currentTimeMillis());
                     final  String showedMsg="server"+time+":"+msg+"\n";
