@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.lang.ref.WeakReference;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,7 +43,9 @@ public class TCPClientActivity extends Activity implements View.OnClickListener 
     private EditText mMessageEditText;
     private PrintWriter mPrintWriter;//通过这个与服务端发送消息
     private Socket mClientSocket;
-    @SuppressLint("HandlerLeak")
+    //创建handler的方式一（不规范），此时Handler会隐式地持有一个外部类对象（通常是一个Activity）的引用。当Activity已经被用户关闭时，
+    // 由于Handler持有Activity的引用造成Activity无法被GC回收，这样容易造成内存泄露。
+    @SuppressLint("HandlerLeak")//忽略内存泄漏的警告
     private Handler mHandler=new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -59,6 +62,7 @@ public class TCPClientActivity extends Activity implements View.OnClickListener 
 
         }
     };
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +96,7 @@ public class TCPClientActivity extends Activity implements View.OnClickListener 
     @Override
     public void onClick(View v) {
         if (v==mSendButton){
+            //发送消息给服务端
                     final String msg=mMessageEditText.getText().toString();
                     if (!TextUtils.isEmpty(msg)&&mPrintWriter!=null){
                         new Thread(new Runnable() {

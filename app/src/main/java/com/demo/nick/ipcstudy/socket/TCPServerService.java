@@ -25,7 +25,7 @@ import java.util.Random;
 
 public class TCPServerService extends Service {
     private static final String TAG = "TCPServerService";
-    private boolean mIsServiceDestoryed=false;
+    private boolean mIsServiceDestoryed=false;//服务端是否关闭
 
     private String[] mDefinedMessages=new String[]{
             "你好啊",
@@ -94,12 +94,13 @@ public class TCPServerService extends Service {
         PrintWriter out=new PrintWriter(new BufferedWriter(new OutputStreamWriter(client.getOutputStream())),true);//创建输出流，
         out.println("欢迎来到聊天室");
         while (!mIsServiceDestoryed){
-            String st=in.readLine();//读取消息
+            String st=in.readLine();//读取消息 当客户端断开连接后，服务端的输入流会返回Null
             System.out.println(st);
             if (st==null){
                 //客户端断开连接
                 break;
             }
+            //随机发送一条消息给客户端
             int i=new Random().nextInt(mDefinedMessages.length);
             String msg=mDefinedMessages[i];
             out.println(msg);//发消息给客户端
