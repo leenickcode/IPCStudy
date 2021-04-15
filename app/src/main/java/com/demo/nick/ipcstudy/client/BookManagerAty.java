@@ -81,6 +81,7 @@ public class BookManagerAty extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_manager_aty);
         Intent intent=new Intent(this, BookManagerService.class);
+        startActivity(intent);
         bindService(intent,mConnection, Context.BIND_AUTO_CREATE);
     }
 

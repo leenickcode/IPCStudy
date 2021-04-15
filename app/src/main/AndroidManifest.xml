@@ -27,7 +27,13 @@
             android:process=":remote" />
 
         <activity android:name=".client.MessengerAty" />
-        <activity android:name=".client.BookManagerAty"></activity>
+        <activity android:name=".client.BookManagerAty">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <provider
             android:name=".contentprovider.BookProvider"
@@ -36,11 +42,7 @@
 
         <activity android:name=".contentprovider.ProviderAty"></activity>
         <activity android:name=".socket.TCPClientActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <service android:name=".socket.TCPServerService"
             android:process=":provider"
